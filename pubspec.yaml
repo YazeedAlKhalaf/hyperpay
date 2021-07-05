@@ -1,11 +1,11 @@
 name: hyperpay
-description: A Flutter package to interface with HyperPay native SDKs
+description: A new flutter plugin project.
 version: 0.0.1
 author: Yazeed AlKhalaf <yazeedfady@gmail.com>
 homepage: https://github.com/YazeedAlKhalaf/hyperpay
 
 environment:
-  sdk: ">=2.7.0 <3.0.0"
+  sdk: ">=2.12.0 <3.0.0"
   flutter: ">=1.20.0"
 
 dependencies:
