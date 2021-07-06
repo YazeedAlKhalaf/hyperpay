@@ -15,7 +15,7 @@ A new flutter plugin project.
   s.source           = { :path => '.' }
   s.source_files = 'Classes/**/*'
   s.dependency 'Flutter'
-  s.platform = :ios, '8.0'
+  s.platform = :ios, '10.0'
   
   s.preserve_paths = 'OPPWAMobile.framework'
   s.xcconfig = { 'OTHER_LDFLAGS' => '-framework OPPWAMobile' }
