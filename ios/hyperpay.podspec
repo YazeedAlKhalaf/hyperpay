@@ -13,13 +13,14 @@ A new flutter plugin project.
   s.license          = { :file => '../LICENSE' }
   s.author           = { 'Your Company' => 'email@example.com' }
   s.source           = { :path => '.' }
-  s.source_files = 'Classes/**/*'
+  s.source_files = 'Classes/**/*', 'OPPWAMobile.framework/**/*'
   s.dependency 'Flutter'
   s.platform = :ios, '10.0'
   
-  s.preserve_paths = 'OPPWAMobile.framework'
-  s.xcconfig = { 'OTHER_LDFLAGS' => '-framework OPPWAMobile' }
+  # s.preserve_paths = 'OPPWAMobile.framework'
+  # s.xcconfig = { 'OTHER_LDFLAGS' => '-framework OPPWAMobile' }
   s.vendored_frameworks = 'OPPWAMobile.framework'
+  s.public_header_files = 'OPPWAMobile.framework/Versions/2.56.0/Headers/*.h'
 
   # Flutter.framework does not contain a i386 slice.
   s.pod_target_xcconfig = { 'DEFINES_MODULE' => 'YES', 'EXCLUDED_ARCHS[sdk=iphonesimulator*]' => 'i386' }
