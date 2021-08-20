@@ -2,6 +2,8 @@
 
 > this plugin is not official.
 
+This plugin is a wrapper around the official SDK of [HyperPay](https://www.hyperpay.com/).
+
 ## 🔥 Features:
 
 - 😌 Easy to setup!
