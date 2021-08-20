@@ -63,16 +63,18 @@ This will guide your through the process of implementing the iOS part that is ne
    2. Add this code code snippet to your Podfile:
 
    ```ruby
-   post_install do |installer|
-       installer.pods_project.targets.each do |target|
-       flutter_additional_ios_build_settings(target)
+    post_install do |installer|
+      installer.pods_project.targets.each do |target|
+        flutter_additional_ios_build_settings(target)
 
-       # add this from here
-       target.build_configurations.each do |config|
-           config.build_settings['IPHONEOS_DEPLOYMENT_TARGET'] = '10.0'
-       end
-       # to here
-   end
+        # from here.
+        target.build_configurations.each do |config|
+          config.build_settings['IPHONEOS_DEPLOYMENT_TARGET'] = '10.0'
+        end
+        # to here.
+
+      end
+    end
    ```
 
    This makes sure that all packages and plugins you use have a deployment target of `10.0`.
@@ -85,12 +87,12 @@ This will guide your through the process of implementing the iOS part that is ne
     # some code here
 
     post_install do |installer|
-        installer.pods_project.targets.each do |target|
-            flutter_additional_ios_build_settings(target)
-            target.build_configurations.each do |config|
-                config.build_settings['IPHONEOS_DEPLOYMENT_TARGET'] = '10.0'
-            end
+      installer.pods_project.targets.each do |target|
+        flutter_additional_ios_build_settings(target)
+        target.build_configurations.each do |config|
+          config.build_settings['IPHONEOS_DEPLOYMENT_TARGET'] = '10.0'
         end
+      end
     end
    ```
 
