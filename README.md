@@ -48,6 +48,52 @@ This will guide your through the process of implementing the iOS part that is ne
     </array>
    ```
 
+2. Edit your Podfile that is located under your project's iOS folder:
+
+   1. Uncomment the line that looks something like this:
+
+   ```ruby
+   # Before
+   # platform :ios, '9.0'
+
+   # After
+   platform :ios, '10.0'
+   ```
+
+   2. Add this code code snippet to your Podfile:
+
+   ```ruby
+   post_install do |installer|
+       installer.pods_project.targets.each do |target|
+       flutter_additional_ios_build_settings(target)
+
+       # add this from here
+       target.build_configurations.each do |config|
+           config.build_settings['IPHONEOS_DEPLOYMENT_TARGET'] = '10.0'
+       end
+       # to here
+   end
+   ```
+
+   This makes sure that all packages and plugins you use have a deployment target of `10.0`.
+   You Podfile should look similar to:
+
+   ```ruby
+    # Uncomment this line to define a global platform for your project
+    platform :ios, '10.0'
+
+    # some code here
+
+    post_install do |installer|
+        installer.pods_project.targets.each do |target|
+            flutter_additional_ios_build_settings(target)
+            target.build_configurations.each do |config|
+                config.build_settings['IPHONEOS_DEPLOYMENT_TARGET'] = '10.0'
+            end
+        end
+    end
+   ```
+
 ## 🚨 Error Handling
 
 All our error codes start with `hyperpay-` prefix.
