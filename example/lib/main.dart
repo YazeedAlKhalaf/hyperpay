@@ -19,7 +19,7 @@ class _MyAppState extends State<MyApp> {
       await HyperpayService.getHyperpayResponse(
         arguments: {
           "checkoutId": "C983B64E8AEDDC9FC769E244DB8ECA19.uat01-vm-tx01",
-          "shopperResultURL": "dev.alkhalaf.hyperpayExample://result",
+          "shopperResultURL": "dev.alkhalaf.hyperpayExample.payments://result",
           "paymentBrand": "",
           "holder": "TEST HUMAN",
           "number": "4200000000000000",
