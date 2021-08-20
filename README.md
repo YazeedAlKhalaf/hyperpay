@@ -96,6 +96,14 @@ This will guide your through the process of implementing the iOS part that is ne
     end
    ```
 
+## 🤖 Android Setup
+
+not implemented yet.
+
+## 🎯 How to use?
+
+not implemented yet.
+
 ## 🚨 Error Handling
 
 All our error codes start with `hyperpay-` prefix.
