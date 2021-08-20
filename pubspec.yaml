@@ -1,5 +1,5 @@
 name: hyperpay
-description: A new flutter plugin project.
+description: A Flutter plugin that wraps the official SDK of hyperpay.
 version: 0.0.1
 author: Yazeed AlKhalaf <yazeedfady@gmail.com>
 homepage: https://github.com/YazeedAlKhalaf/hyperpay
