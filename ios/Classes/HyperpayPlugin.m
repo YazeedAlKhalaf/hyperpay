@@ -114,24 +114,26 @@ NSNotificationName receivePaymentAsyncronouslyNotificationName = @"AsyncPaymentC
     if (error) {
         hyperpayResult([
             FlutterError
-            errorWithCode:@"hyperpay-transaction-error"
-            message:@"Transaction error."
+            errorWithCode:@"hyperpay-card-payment-params-error"
+            message:@"Card payment params error."
             details:[error debugDescription]
         ]);
         return;
     }
     
+    /// set the `shopperResultURL` in the card payment params.
     params.shopperResultURL = shopperResultURL;
     
+    /// create a transaction.
     OPPTransaction* transaction = [OPPTransaction transactionWithPaymentParams:params];
     
+    /// process the transaction.
     [paymentProvider submitTransaction:transaction completionHandler:^(OPPTransaction * _Nullable transaction, NSError * _Nullable error) {
         if (error || !transaction) {
-            NSLog(@"inside paymentProvider completion handler");
             hyperpayResult([
                 FlutterError
                 errorWithCode:@"hyperpay-transaction-error"
-                message:@"Transaction error during opening the payment page."
+                message:@"Transaction error."
                 details:[error debugDescription]
             ]);
             return;
@@ -147,7 +149,6 @@ NSNotificationName receivePaymentAsyncronouslyNotificationName = @"AsyncPaymentC
             return;
         }
         
-        NSLog(@"error result final");
         hyperpayResult([
             FlutterError
             errorWithCode:@"hyperpay-transaction-failure"
@@ -164,7 +165,7 @@ NSNotificationName receivePaymentAsyncronouslyNotificationName = @"AsyncPaymentC
     // return a string that says "success" indicating the successful
     // processing of the payment.
     dispatch_async(dispatch_get_main_queue(), ^{
-        hyperpayResult(@"success");
+        hyperpayResult(@"success sync");
     });
 }
 
@@ -193,7 +194,7 @@ NSNotificationName receivePaymentAsyncronouslyNotificationName = @"AsyncPaymentC
      dismissCheckoutAnimated:true
      completion:^{
         dispatch_async(dispatch_get_main_queue(), ^{
-            hyperpayResult(@"success");
+            hyperpayResult(@"success async");
         });
     }];
 }

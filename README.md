@@ -12,9 +12,9 @@
 All our error codes start with `hyperpay-` prefix.
 To handle errors you have to catch `PlatformException`.
 
-| Error Code                      | Description                                                                    |
-| ------------------------------- | ------------------------------------------------------------------------------ |
-| `hyperpay-method-not-found`     | This indicates that the method you invoked through the channel does not exist. |
-| `hyperpay-transaction-error`    | This indicates that the transaction has an error.                              |
-| `hyperpay-transaction-failure`  | This indicates that the transaction failed for unknown reason.                 |
-| `hyperpay-transaction-canceled` | This indicates that the transaction was canceled prematurely.                  |
+| Error Code                           | Description                                                                    |
+| ------------------------------------ | ------------------------------------------------------------------------------ |
+| `hyperpay-method-not-found`          | This indicates that the method you invoked through the channel does not exist. |
+| `hyperpay-transaction-error`         | This indicates that the transaction has an error.                              |
+| `hyperpay-transaction-failure`       | This indicates that the transaction failed for unknown reason.                 |
+| `hyperpay-card-payment-params-error` | This indicated that the card payment params has an error.                      |
