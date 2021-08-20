@@ -6,6 +6,14 @@
 NSString* checkoutId = @"";
 NSString* shopperResultURL = @"";
 
+// credit card info variables.
+NSString* paymentBrand = @"";
+NSString* holder = @"";
+NSString* number = @"";
+NSString* expiryMonth = @"";
+NSString* expiryYear = @"";
+NSString* cvv = @"";
+
 // platform channel variables.
 FlutterMethodCall* hyperpayMethodCall;
 FlutterResult hyperpayResult;
@@ -52,12 +60,9 @@ NSNotificationName receivePaymentAsyncronouslyNotificationName = @"AsyncPaymentC
     // runs the initialization code for arguments from `hyperpayMethodCall`.
     [self initializeArgumentsFromHyperpayMethodCall];
     
-    // runs the initialization code for starting a payment.
-    [self intializeCheckoutSettings];
-    
-    // shows the ready UI.
     dispatch_async(dispatch_get_main_queue(), ^{
-        [self openReadyUI];
+        // process card info.
+        [self processWithCustomUI];
     });
 }
 
@@ -72,6 +77,8 @@ NSNotificationName receivePaymentAsyncronouslyNotificationName = @"AsyncPaymentC
     if ([mode isEqualToString:@"LIVE"]) {
         paymentProviderMode = OPPProviderModeLive;
     }
+    // setup `paymentProvider`
+    paymentProvider = [OPPPaymentProvider paymentProviderWithMode:paymentProviderMode];
     
     // set `checkoutId` in the class to the value coming from the arguments.
     checkoutId = arguments[@"checkoutId"];
@@ -79,33 +86,48 @@ NSNotificationName receivePaymentAsyncronouslyNotificationName = @"AsyncPaymentC
     // set `shopperResultURL` in the class to the value coming from the arguments.
     // the `shopperResultURL` is used for coming back the app after verifying with the bank.
     shopperResultURL = arguments[@"shopperResultURL"];
+    
+    // set credit card values.
+    paymentBrand = arguments[@"paymentBrand"];
+    holder = arguments[@"holder"];
+    number = arguments[@"number"];
+    expiryMonth = arguments[@"expiryMonth"];
+    expiryYear = arguments[@"expiryYear"];
+    cvv = arguments[@"cvv"];
 }
 
-- (void)intializeCheckoutSettings {
-    // setup `checkoutSettings`
-    checkoutSettings = [[OPPCheckoutSettings alloc] init];
-    checkoutSettings.shopperResultURL = shopperResultURL;
-    checkoutSettings.displayTotalAmount = true;
-    checkoutSettings.paymentBrands = @[@"VISA", @"DIRECTDEBIT_SEPA"];
+- (void)processWithCustomUI {
     
-    // setup `paymentProvider`
-    paymentProvider = [OPPPaymentProvider paymentProviderWithMode:paymentProviderMode];
     
-    // setup `checkoutProvider`
-    checkoutProvider = [
-        OPPCheckoutProvider
-        checkoutProviderWithPaymentProvider:paymentProvider
-        checkoutID:checkoutId
-        settings:checkoutSettings
+    NSError* error = nil;
+    OPPCardPaymentParams* params = [
+        OPPCardPaymentParams
+        cardPaymentParamsWithCheckoutID:checkoutId
+        paymentBrand:paymentBrand
+        holder:holder
+        number:number
+        expiryMonth:expiryMonth
+        expiryYear:expiryYear
+        CVV:cvv
+        error:&error
     ];
-    checkoutProvider.delegate = self;
-}
-
-- (void)openReadyUI {
-    // open the payment page.
-    [checkoutProvider
-     presentCheckoutForSubmittingTransactionCompletionHandler:^(OPPTransaction * _Nullable transaction, NSError * _Nullable error) {
+    if (error) {
+        hyperpayResult([
+            FlutterError
+            errorWithCode:@"hyperpay-transaction-error"
+            message:@"Transaction error."
+            details:[error debugDescription]
+        ]);
+        return;
+    }
+    
+    params.shopperResultURL = shopperResultURL;
+    
+    OPPTransaction* transaction = [OPPTransaction transactionWithPaymentParams:params];
+    
+    [paymentProvider submitTransaction:transaction completionHandler:^(OPPTransaction * _Nullable transaction, NSError * _Nullable error) {
         if (error || !transaction) {
+            NSLog(@"inside paymentProvider completion handler");
             hyperpayResult([
                 FlutterError
                 errorWithCode:@"hyperpay-transaction-error"
@@ -125,20 +147,12 @@ NSNotificationName receivePaymentAsyncronouslyNotificationName = @"AsyncPaymentC
             return;
         }
         
+        NSLog(@"error result final");
         hyperpayResult([
             FlutterError
             errorWithCode:@"hyperpay-transaction-failure"
             message:@"Transaction failed for unknown reason."
             details:@"If you think this is a bug, please file an issue in the GitHub repository: https://github.com/YazeedAlKhalaf/hyperpay."
-        ]);
-        return;
-    }
-     cancelHandler:^{
-        hyperpayResult([
-            FlutterError
-            errorWithCode:@"hyperpay-transaction-canceled"
-            message:@"Transaction canceled."
-            details:@"Transaction was canceled prematurely."
         ]);
         return;
     }];

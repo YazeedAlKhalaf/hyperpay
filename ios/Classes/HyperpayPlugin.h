@@ -7,9 +7,7 @@
 
 - (void)initializeArgumentsFromHyperpayMethodCall;
 
-- (void)intializeCheckoutSettings;
-
-- (void)openReadyUI;
+- (void)processWithCustomUI;
 
 - (void)processSyncronousPayment;
 

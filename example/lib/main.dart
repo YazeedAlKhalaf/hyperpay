@@ -16,10 +16,18 @@ class MyApp extends StatefulWidget {
 class _MyAppState extends State<MyApp> {
   Future<void> doCheckout() async {
     try {
-      await HyperpayService.getHyperpayResponse(arguments: {
-        "checkoutId": "C24A5E796703B6666278CBB4D749EB08.uat01-vm-tx04",
-        "shopperResultURL": "dev.alkhalaf.hyperpayExample://result",
-      });
+      await HyperpayService.getHyperpayResponse(
+        arguments: {
+          "checkoutId": "C983B64E8AEDDC9FC769E244DB8ECA19.uat01-vm-tx01",
+          "shopperResultURL": "dev.alkhalaf.hyperpayExample://result",
+          "paymentBrand": "",
+          "holder": "TEST HUMAN",
+          "number": "4200000000000000",
+          "expiryMonth": "06",
+          "expiryYear": "2030",
+          "cvv": "123",
+        },
+      );
     } on PlatformException catch (exception) {
       print("platform exception: $exception");
     }
