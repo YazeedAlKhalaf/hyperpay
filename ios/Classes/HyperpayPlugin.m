@@ -26,6 +26,8 @@ OPPCheckoutSettings* checkoutSettings;
 
 // misc variables.
 NSNotificationName receivePaymentAsyncronouslyNotificationName = @"AsyncPaymentCompletedNotificationKey";
+SFSafariViewController* safariVC;
+NSString* appBundleId;
 
 + (void)registerWithRegistrar:(NSObject<FlutterPluginRegistrar>*)registrar {
     FlutterMethodChannel* channel = [FlutterMethodChannel
@@ -33,6 +35,7 @@ NSNotificationName receivePaymentAsyncronouslyNotificationName = @"AsyncPaymentC
                                      binaryMessenger:[registrar messenger]];
     HyperpayPlugin* instance = [[HyperpayPlugin alloc] init];
     [registrar addMethodCallDelegate:instance channel:channel];
+    [registrar addApplicationDelegate:instance];
 }
 
 - (void)handleMethodCall:(FlutterMethodCall*)call result:(FlutterResult)result {
@@ -40,6 +43,9 @@ NSNotificationName receivePaymentAsyncronouslyNotificationName = @"AsyncPaymentC
     hyperpayMethodCall = call;
     // set the `result` to `hyperpayResult` so it is accessible in the whole class.
     hyperpayResult = result;
+    
+    // set the `appBundleId`.
+    appBundleId = [NSString stringWithFormat:@"%@", NSBundle.mainBundle.bundleIdentifier];
     
     // "getHyperpayResponse" method.
     if ([hyperpayMethodCall.method isEqualToString:@"getHyperpayResponse"]) {
@@ -83,10 +89,6 @@ NSNotificationName receivePaymentAsyncronouslyNotificationName = @"AsyncPaymentC
     // set `checkoutId` in the class to the value coming from the arguments.
     checkoutId = arguments[@"checkoutId"];
     
-    // set `shopperResultURL` in the class to the value coming from the arguments.
-    // the `shopperResultURL` is used for coming back the app after verifying with the bank.
-    shopperResultURL = arguments[@"shopperResultURL"];
-    
     // set credit card values.
     paymentBrand = arguments[@"paymentBrand"];
     holder = arguments[@"holder"];
@@ -97,9 +99,7 @@ NSNotificationName receivePaymentAsyncronouslyNotificationName = @"AsyncPaymentC
 }
 
 - (void)processWithCustomUI {
-    
-    
-    NSError* error = nil;
+    NSError* cardPaymentParamsError = nil;
     OPPCardPaymentParams* params = [
         OPPCardPaymentParams
         cardPaymentParamsWithCheckoutID:checkoutId
@@ -109,20 +109,20 @@ NSNotificationName receivePaymentAsyncronouslyNotificationName = @"AsyncPaymentC
         expiryMonth:expiryMonth
         expiryYear:expiryYear
         CVV:cvv
-        error:&error
+        error:&cardPaymentParamsError
     ];
-    if (error) {
+    if (cardPaymentParamsError) {
         hyperpayResult([
             FlutterError
             errorWithCode:@"hyperpay-card-payment-params-error"
             message:@"Card payment params error."
-            details:[error debugDescription]
+            details:[cardPaymentParamsError debugDescription]
         ]);
         return;
     }
     
     /// set the `shopperResultURL` in the card payment params.
-    params.shopperResultURL = shopperResultURL;
+    params.shopperResultURL = [appBundleId stringByAppendingString:@".payments://result"];
     
     /// create a transaction.
     OPPTransaction* transaction = [OPPTransaction transactionWithPaymentParams:params];
@@ -146,6 +146,12 @@ NSNotificationName receivePaymentAsyncronouslyNotificationName = @"AsyncPaymentC
         
         if (transaction.type == OPPTransactionTypeAsynchronous) {
             [self processAsyncronousPayment];
+            
+            // show a safari view controller to finish the async payment.
+            safariVC = [[SFSafariViewController alloc] initWithURL:transaction.redirectURL];
+            safariVC.delegate = self;
+            UIViewController* rootVC = [[[[UIApplication sharedApplication]delegate] window] rootViewController];
+            [rootVC presentViewController:safariVC animated:YES completion: nil];
             return;
         }
         
@@ -190,13 +196,20 @@ NSNotificationName receivePaymentAsyncronouslyNotificationName = @"AsyncPaymentC
      object:NULL];
     
     // close checkout pages to make sure the shopper's data is safe.
-    [checkoutProvider
-     dismissCheckoutAnimated:true
-     completion:^{
+    [safariVC dismissViewControllerAnimated:YES completion:^{
         dispatch_async(dispatch_get_main_queue(), ^{
             hyperpayResult(@"success async");
         });
     }];
+}
+
+- (BOOL)application:(UIApplication *)app openURL:(NSURL *)url options:(NSDictionary *)options {
+    if ([url.scheme caseInsensitiveCompare:[appBundleId stringByAppendingString:@".payments"]] == NSOrderedSame) {
+        [self didReceiveAsynchronousPaymentCallback];
+        return YES;
+    } else {
+        return NO;
+    }
 }
 
 @end

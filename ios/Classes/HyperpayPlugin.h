@@ -1,7 +1,8 @@
 #import <Flutter/Flutter.h>
 #import <OPPWAMobile/OPPWAMobile.h>
+#import <SafariServices/SafariServices.h>
 
-@interface HyperpayPlugin : NSObject<FlutterPlugin, OPPCheckoutProviderDelegate>
+@interface HyperpayPlugin : NSObject<FlutterPlugin, OPPCheckoutProviderDelegate, SFSafariViewControllerDelegate>
 
 - (void)getHyperpayResponse;
 
