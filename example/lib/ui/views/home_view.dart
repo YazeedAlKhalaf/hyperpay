@@ -49,6 +49,20 @@ class _HomeViewState extends State<HomeView> {
     });
   }
 
+  Future<void> getPaymentStatus() async {
+    setState(() {
+      isBusy = true;
+    });
+
+    await _hyperpayApiService.getPaymentStatus(
+      checkoutId: checkoutId!,
+    );
+
+    setState(() {
+      isBusy = false;
+    });
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -85,6 +99,14 @@ class _HomeViewState extends State<HomeView> {
                 onPressed: () async {
                   await doCheckout();
                 },
+              ),
+              ElevatedButton(
+                child: Text("Get Payment Status"),
+                onPressed: checkoutId != null
+                    ? () async {
+                        await getPaymentStatus();
+                      }
+                    : null,
               ),
               if (isBusy) Center(child: const CircularProgressIndicator()),
             ],
